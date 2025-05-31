@@ -18,7 +18,7 @@
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f9f9f9;
@@ -78,6 +78,7 @@
             font-weight: 600;
             width: 100%;
             transition: background-color 0.3s;
+            margin-top: 10px;
         }
         
         button:hover {
@@ -100,19 +101,22 @@
         .prediction {
             font-size: 18px;
             font-weight: 600;
-            padding: 10px;
+            padding: 15px;
             border-radius: 4px;
             text-align: center;
+            margin: 10px 0;
         }
         
         .healthy {
             background-color: rgba(39, 174, 96, 0.2);
             color: var(--success-color);
+            border: 1px solid var(--success-color);
         }
         
         .risk {
             background-color: rgba(231, 76, 60, 0.2);
             color: var(--danger-color);
+            border: 1px solid var(--danger-color);
         }
         
         .probability {
@@ -151,6 +155,7 @@
             font-size: 14px;
             color: var(--dark-gray);
             margin-top: 5px;
+            font-style: italic;
         }
     </style>
 </head>
@@ -161,110 +166,106 @@
         <form method="post" action="/predict">
             <div class="form-row">
                 <div class="form-col">
+                    <!-- Columna 1 -->
                     <div class="form-group">
                         <label for="age">Edad</label>
-                        <input type="number" id="age" name="age" min="18" max="120" value="{{ age if age else '' }}" required>
+                        <input type="number" id="age" name="age" min="18" max="120" value="{{ age if age else '65' }}" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="sex">Sexo</label>
                         <select id="sex" name="sex" required>
-                            <option value="">Seleccione...</option>
-                            <option value="0" {% if sex == '0' %}selected{% endif %}>Mujer</option>
-                            <option value="1" {% if sex == '1' %}selected{% endif %}>Hombre</option>
+                            <option value="0">Mujer</option>
+                            <option value="1" selected>Hombre</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="cp">Tipo de dolor torácico</label>
                         <select id="cp" name="cp" required>
-                            <option value="">Seleccione...</option>
                             <option value="0">Típica angina</option>
                             <option value="1">Angina atípica</option>
                             <option value="2">Dolor no anginoso</option>
-                            <option value="3">Asintomático</option>
+                            <option value="3" selected>Asintomático</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="trestbps">Presión arterial en reposo (mm Hg)</label>
-                        <input type="number" id="trestbps" name="trestbps" min="80" max="200" value="{{ trestbps if trestbps else '' }}" required>
+                        <input type="number" id="trestbps" name="trestbps" min="80" max="200" value="{{ trestbps if trestbps else '120' }}" required>
                         <p class="info-text">Valor normal: 90-120 mm Hg</p>
                     </div>
                     
                     <div class="form-group">
                         <label for="chol">Colesterol sérico (mg/dl)</label>
-                        <input type="number" id="chol" name="chol" min="100" max="600" value="{{ chol if chol else '' }}" required>
-                        <p class="info-text">Valor deseable: <200 mg/dl</p>
+                        <input type="number" id="chol" name="chol" min="100" max="600" value="{{ chol if chol else '200' }}" required>
+                        <p class="info-text">Valor deseable: &lt;200 mg/dl</p>
                     </div>
                     
                     <div class="form-group">
                         <label for="fbs">Glucosa en ayunas > 120 mg/dl</label>
                         <select id="fbs" name="fbs" required>
-                            <option value="">Seleccione...</option>
-                            <option value="0">No</option>
+                            <option value="0" selected>No</option>
                             <option value="1">Sí</option>
                         </select>
                     </div>
                 </div>
                 
                 <div class="form-col">
+                    <!-- Columna 2 -->
                     <div class="form-group">
-                        <label for="restecg">Resultados electrocardiográficos en reposo</label>
+                        <label for="restecg">Resultados electrocardiográficos</label>
                         <select id="restecg" name="restecg" required>
-                            <option value="">Seleccione...</option>
-                            <option value="0">Normal</option>
-                            <option value="1">Anormalidad de onda ST-T</option>
-                            <option value="2">Hipertrofia ventricular izquierda probable</option>
+                            <option value="0" selected>Normal</option>
+                            <option value="1">Anormalidad ST-T</option>
+                            <option value="2">Hipertrofia ventricular</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="thalach">Frecuencia cardíaca máxima alcanzada</label>
-                        <input type="number" id="thalach" name="thalach" min="60" max="220" value="{{ thalach if thalach else '' }}" required>
+                        <input type="number" id="thalach" name="thalach" min="60" max="220" value="{{ thalach if thalach else '130' }}" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="exang">Angina inducida por ejercicio</label>
                         <select id="exang" name="exang" required>
-                            <option value="">Seleccione...</option>
-                            <option value="0">No</option>
+                            <option value="0" selected>No</option>
                             <option value="1">Sí</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="oldpeak">Depresión del ST inducida por ejercicio</label>
-                        <input type="number" step="0.1" id="oldpeak" name="oldpeak" min="0" max="10" value="{{ oldpeak if oldpeak else '' }}" required>
+                        <input type="number" step="0.1" id="oldpeak" name="oldpeak" min="0" max="10" value="{{ oldpeak if oldpeak else '0.0' }}" required>
+                        <p class="info-text">Medida de anomalías en el ECG</p>
                     </div>
                     
                     <div class="form-group">
-                        <label for="slope">Pendiente del segmento ST en ejercicio máximo</label>
+                        <label for="slope">Pendiente del segmento ST</label>
                         <select id="slope" name="slope" required>
-                            <option value="">Seleccione...</option>
                             <option value="0">Ascendente</option>
-                            <option value="1">Plano</option>
+                            <option value="1" selected>Plana</option>
                             <option value="2">Descendente</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="ca">Número de vasos principales coloreados por fluoroscopia</label>
+                        <label for="ca">Vasos principales coloreados</label>
                         <select id="ca" name="ca" required>
-                            <option value="">Seleccione...</option>
-                            <option value="0">0</option>
+                            <option value="0" selected>0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                         </select>
+                        <p class="info-text">Número de vasos visibles en fluoroscopia</p>
                     </div>
                     
                     <div class="form-group">
-                        <label for="thal">Talio</label>
+                        <label for="thal">Resultado de talio</label>
                         <select id="thal" name="thal" required>
-                            <option value="">Seleccione...</option>
                             <option value="0">Normal</option>
-                            <option value="1">Defecto fijo</option>
+                            <option value="1" selected>Defecto fijo</option>
                             <option value="2">Defecto reversible</option>
                         </select>
                     </div>
