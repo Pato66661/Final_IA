@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Enfermedades Cardíacas</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-gray: #ecf0f1;
+            --dark-gray: #7f8c8d;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s;
+            box-sizing: border-box;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .result-title {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        
+        .prediction {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .healthy {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+        
+        .risk {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .probability {
+            margin-top: 10px;
+            font-size: 16px;
+            text-align: center;
+            color: var(--dark-gray);
+        }
+        
+        .error {
+            color: var(--danger-color);
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: var(--dark-gray);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Predicción de Riesgo Cardíaco</h1>
+        
+        <form method="post" action="/predict">
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="age">Edad</label>
+                        <input type="number" id="age" name="age" min="18" max="120" value="{{ age if age else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sex">Sexo</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Seleccione...</option>
+                            <option value="0" {% if sex == '0' %}selected{% endif %}>Mujer</option>
+                            <option value="1" {% if sex == '1' %}selected{% endif %}>Hombre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trestbps">Presión arterial en reposo (mm Hg)</label>
+                        <input type="number" id="trestbps" name="trestbps" min="80" max="200" value="{{ trestbps if trestbps else '' }}" required>
+                        <p class="info-text">Valor normal: 90-120 mm Hg</p>
+                    </div>
+                </div>
+                
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="chol">Colesterol sérico (mg/dl)</label>
+                        <input type="number" id="chol" name="chol" min="100" max="600" value="{{ chol if chol else '' }}" required>
+                        <p class="info-text">Valor deseable: <200 mg/dl</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="thalach">Frecuencia cardíaca máxima alcanzada</label>
+                        <input type="number" id="thalach" name="thalach" min="60" max="220" value="{{ thalach if thalach else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="oldpeak">Depresión del ST inducida por ejercicio</label>
+                        <input type="number" step="0.1" id="oldpeak" name="oldpeak" min="0" max="10" value="{{ oldpeak if oldpeak else '' }}" required>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit">Evaluar Riesgo Cardíaco</button>
+        </form>
+    </div>
+
+    {% if show_result %}
+    <div class="result-container">
+        <h2 class="result-title">Resultado de la Evaluación</h2>
+        <div class="prediction {% if 'Sano' in result %}healthy{% else %}risk{% endif %}">
+            {{ result.split('(')[0] }}
+        </div>
+        {% if 'Probabilidad' in result %}
+        <div class="probability">
+            {{ result.split('(')[1].split(')')[0] }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error">
+        <p>{{ error }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>
