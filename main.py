@@ -9,7 +9,7 @@ import pandas as pd
 app = FastAPI()
 
 # Configuración para archivos estáticos (robots.txt, etc.)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+#app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
